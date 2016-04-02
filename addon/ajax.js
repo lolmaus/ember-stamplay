@@ -47,6 +47,11 @@ export default AjaxService.extend({
     return `api/user/${apiVersion}/users`;
   }),
 
+  userStatusPath: computed('apiVersion', function () {
+    const apiVersion = this.get('apiVersion');
+    return `api/user/${apiVersion}/getstatus`;
+  }),
+
   objectPath: computed('apiVersion', function () {
     const apiVersion = this.get('apiVersion');
     return `api/cobject/${apiVersion}`;
@@ -83,11 +88,17 @@ export default AjaxService.extend({
 
 
   // ----- Methods -----
-  parseRawResponse ({jqXHR, response}) {
+  parseRawResponse ({jqXHR, response: user}) {
     return {
-      user:      response,
+      user,
       authToken: jqXHR.getResponseHeader('x-stamplay-jwt')
     };
+  },
+
+  applyAuthentication ({user, authToken, user: {id}}) {
+    this
+      .get('session')
+      .authenticate('authenticator:stamplay', {mode: 'restore', id, authToken, user});
   },
 
   authenticate (data) { // email, password
@@ -101,19 +112,18 @@ export default AjaxService.extend({
       .then(this.parseRawResponse);
   },
 
-  restore ({id, authToken}) {
-    const userPath      = this.get('userPath');
-    const userPathFinal = `${userPath}/${id}`;
+  restore (authToken) {
+    const userStatusPath = this.get('userStatusPath');
 
     return this
-      .raw(userPathFinal, {
+      .raw(userStatusPath, {
         // Have to provide headers manually because the session is not
         // authenticated during this request.
         headers: {
           'x-stamplay-jwt': authToken
         }
       })
-      .then(this.parseRawResponse);
+      .then(({response: {user}}) => ({user, authToken}));
   },
 
   invalidate () {
@@ -125,6 +135,12 @@ export default AjaxService.extend({
       .catch(noop); // Remove once logout starts working
   },
 
+  restoreAndAuthenticate (authToken) {
+    return this
+      .restore(authToken)
+      .then(data => this.applyAuthentication(data));
+  },
+
   createUserAndAuthenticate (data) { // email, password, displayName, profileImg...
     const userPath  = this.get('userPath');
 
@@ -134,10 +150,17 @@ export default AjaxService.extend({
          data
       })
       .then(this.parseRawResponse)
-      .then(({user, authToken, user: {id}}) => {
-        this
-          .get('session')
-          .authenticate('authenticator:stamplay', {mode: 'restore', id, authToken, user});
-      });
+      .then(data => this.applyAuthentication(data));
+  },
+  
+  socialURL (service) {
+    const host     = this.get('host');
+    const authPath = this.get('authPath');
+    return `${host}/${authPath}/${service}/connect`;
+  },
+  
+  socialAuth (service) {
+    const socialURL = this.socialURL(service);
+    window.location.replace(socialURL);
   }
 });

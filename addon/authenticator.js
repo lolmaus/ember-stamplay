@@ -39,7 +39,7 @@ export default BaseAuthenticator.extend({
   restore (data) {
     return this
       .get('ajaxStamplay')
-      .restore(data)
+      .restore(data.authToken)
       .then(({user}) => {
         this.populateUser(user);
         return data;
