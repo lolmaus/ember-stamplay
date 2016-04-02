@@ -29,7 +29,7 @@ export default BaseAuthenticator.extend({
 
     return this
       .get('ajaxStamplay')
-      .authenticate(email, password)
+      .authenticate({email, password})
       .then(({user, authToken, user: {id}}) => {
         this.populateUser(user);
         return {authToken, id};
