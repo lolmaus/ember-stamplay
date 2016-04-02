@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-stamplay-rest'
+  name: 'ember-stamplay'
 };
