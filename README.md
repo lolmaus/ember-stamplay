@@ -1,8 +1,8 @@
-# ember-stamplay-rest
+# ember-stamplay
 
 [Stamplay](https://stamplay.com/) is a new JavaScript-centric BaaS (backend as a service), ideal for Ember developers.
 
-`ember-stamplay-rest` is a work-in-progress Ember addon aiming at providing first-class support for Stamplay.
+`ember-stamplay` is a work-in-progress Ember addon aiming at providing first-class support for Stamplay.
 
 We rely on [Ember Data](https://github.com/emberjs/data), [Ember Simple Auth](https://www.npmjs.com/ember-simple-auth) and Stamplay's REST API. We do not use Stamplay's JS SDK.
 

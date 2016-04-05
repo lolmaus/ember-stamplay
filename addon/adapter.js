@@ -1,5 +1,6 @@
 /* jshint ignore:start */
 import Ember from 'ember';
+import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 
 const {
   computed: {alias},
@@ -11,7 +12,7 @@ const {
 
 import RESTAdapter from 'ember-data/adapters/rest';
 
-export default RESTAdapter.extend({
+export default RESTAdapter.extend(DataAdapterMixin, {
 
   // ----- Arguments -----
   PER_PAGE: 20,
@@ -25,6 +26,11 @@ export default RESTAdapter.extend({
 
   // ----- Overridden properties -----
   host: alias('ajaxStamplay.host'),
+  
+  
+  
+  // ----- Static properties -----
+  authorizer: 'authorizer:stamplay',
 
 
 

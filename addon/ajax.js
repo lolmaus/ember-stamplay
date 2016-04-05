@@ -23,14 +23,20 @@ export default AjaxService.extend({
 
 
   // ----- Overridden properties -----
-  headers: Ember.computed('session.data.authenticated.authToken', function () {
-    /* jshint ignore:start */
-    const authToken = this.get('session.data.authenticated.authToken');
+  headers: Ember.computed('session.isAuthenticated', function () {
+    const headers = {};
 
-    return {
-      ...(authToken && {'x-stamplay-jwt': authToken})
-    };
-    /* jshint ignore:end */
+    if (!this.get('session.isAuthenticated')) {
+      return headers;
+    }
+
+    this
+      .get('session')
+      .authorize('authorizer:stamplay', (key, value) => {
+        headers[key] = value;
+      });
+
+    return headers;
   }),
 
 
@@ -152,13 +158,13 @@ export default AjaxService.extend({
       .then(this.parseRawResponse)
       .then(data => this.applyAuthentication(data));
   },
-  
+
   socialURL (service) {
     const host     = this.get('host');
     const authPath = this.get('authPath');
     return `${host}/${authPath}/${service}/connect`;
   },
-  
+
   socialAuth (service) {
     const socialURL = this.socialURL(service);
     window.location.replace(socialURL);
