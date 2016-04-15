@@ -58,6 +58,11 @@ export default AjaxService.extend({
     return `api/user/${apiVersion}/getstatus`;
   }),
 
+  resetPasswordPath: computed('userPath', function () {
+    const userPath = this.get('userPath');
+    return `${userPath}/resetpassword`;
+  }),
+
   objectPath: computed('apiVersion', function () {
     const apiVersion = this.get('apiVersion');
     return `api/cobject/${apiVersion}`;
@@ -168,5 +173,10 @@ export default AjaxService.extend({
   socialAuth (service) {
     const socialURL = this.socialURL(service);
     window.location.replace(socialURL);
+  },
+
+  resetPassword (data) { // email, newPassword
+    const resetPasswordPath = this.get('resetPasswordPath');
+    return this.post(resetPasswordPath, {data});
   }
 });
